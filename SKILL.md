@@ -28,6 +28,8 @@ metadata:
 > **v3.3-experimental**：新增 `assets/life-kline.md`（4 维度 sparkline 轨迹图，评分函数待代码化）。⚠ 实验性功能，需在 `references/pitfalls.md` 中标注"辅助工具"边界。
 
 > v3.0/v3.1 重要规则（仍生效）：天干五行阴阳速查 / 藏干评分（本气×0.5/中气×0.3/余气×0.2）/ 空亡削弱 / 夜子时归属 / 女命伤官见官大忌 / 大白话优先 / 时间线面向未来 / 输出一致性交叉验证
+> 
+> **v3.3.x**：`scripts/bazi_calc.py` 新增 `--kline` 入口，可直接输出人生 K 线报告；`run_from_bazi_dict()` 保留为程序化调用接口。
 
 ## When to Use
 

@@ -510,6 +510,20 @@ def calc_dayun_sequence(month_ganzhi, qiyun, gender, year_gan, num=8):
 
 # ============ 主函数 ============
 
+
+def build_kline_payload(birth_year, birth_dt, gender, year_pz, month_pz, day_pz, hour_pz, day_gan, day_zhi, kong):
+    return {
+        'birth_year': birth_year,
+        'birth_dt': birth_dt.strftime('%Y-%m-%d %H:%M'),
+        'gender': gender,
+        'year_pillar': year_pz,
+        'month_pillar': month_pz,
+        'day_pillar': day_pz,
+        'hour_pillar': hour_pz,
+        'day_master': day_gan,
+        'day_branch': day_zhi,
+    }
+
 def main():
     parser = argparse.ArgumentParser(description='八字排盘计算脚本 v3.2')
     parser.add_argument('-y', '--year', type=int, required=True, help='出生年份（公历）')
@@ -521,6 +535,11 @@ def main():
                         help='性别：M=男, F=女')
     parser.add_argument('--longitude', type=float, default=None,
                         help='出生地经度（可选，用于真太阳时校准）')
+    parser.add_argument('--kline', action='store_true', help='计算人生 K 线并输出')
+    parser.add_argument('--kline-output', type=str, default=None,
+                        help='人生 K 线报告输出文件；不指定则 stdout')
+    parser.add_argument('--kline-max-age', type=int, default=100,
+                        help='人生 K 线计算年龄上限（默认 100）')
     args = parser.parse_args()
 
     # 真太阳时校准
@@ -541,6 +560,8 @@ def main():
     month_pz = calc_month_pillar(birth_dt, year_pz[0])
     day_pz, _ = calc_day_pillar(birth_dt.date())
     hour_pz = calc_hour_pillar(birth_dt.hour, day_pz[0])
+    day_gan = day_pz[0]
+    day_zhi = day_pz[1]
 
     print(f"\n=== 四柱八字 ===")
     print(f"  年柱: {year_pz}  (使用{used_year}年)")
@@ -655,6 +676,33 @@ def main():
     print(f"\n{'='*60}")
     print(f"  排盘完成")
     print(f"{'='*60}")
+
+    bazi_dict = build_kline_payload(
+        args.year, birth_dt, args.gender,
+        year_pz, month_pz, day_pz, hour_pz,
+        day_gan, day_zhi, kong
+    )
+    bazi_dict['strength_score'] = round(float(score), 2)
+    bazi_dict['strength_verdict'] = verdict
+    bazi_dict['strength_advice'] = advice
+
+    if args.kline:
+        try:
+            from life_kline import run_from_bazi_dict, strip_ansi
+        except ImportError as e:
+            print(f"导入 life_kline 失败: {e}")
+            sys.exit(1)
+        out = run_from_bazi_dict(bazi_dict, args.kline_max_age, output_markdown=True)
+        if args.kline_output:
+            out = strip_ansi(out) if isinstance(out, str) else out
+            with open(args.kline_output, 'w', encoding='utf-8') as f:
+                f.write(out)
+            print(f"\n人生 K 线已写入: {args.kline_output}")
+        else:
+            print(f"\n{'='*60}")
+            print(f"  人生 K 线（--kline）")
+            print(f"{'='*60}")
+            print(out)
 
 
 if __name__ == '__main__':
