@@ -24,6 +24,8 @@ metadata:
 # bazi-fortune v3.2
 
 > v3.2 重大升级：① SKILL.md 拆分为 L1 主文件 + L2 references（节省 ~70% token）② 新增 ETHICS.md（心理防护 + 巴纳姆效应）③ 决策路由表（按问题加载对应 reference）④ v3.0 回测用例入 references/self-test.md ⑤ 4 段式 SKILL.md 标准结构（When/Procedure/Pitfalls/Verification）⑥ frontmatter 补 `metadata.hermes.*`
+> 
+> **v3.3-experimental**：新增 `assets/life-kline.md`（4 维度 sparkline 轨迹图，评分函数待代码化）。⚠ 实验性功能，需在 `references/pitfalls.md` 中标注"辅助工具"边界。
 
 > v3.0/v3.1 重要规则（仍生效）：天干五行阴阳速查 / 藏干评分（本气×0.5/中气×0.3/余气×0.2）/ 空亡削弱 / 夜子时归属 / 女命伤官见官大忌 / 大白话优先 / 时间线面向未来 / 输出一致性交叉验证
 
@@ -57,6 +59,7 @@ metadata:
 | 紫微命宫怎么算 | `references/ziwei-lingshu.md` | 推算 + 主星 |
 | 什么是长生十二运/沐浴/墓 | `references/longsheng.md` | 单项解释 |
 | 引用古籍 / 这话谁说的 | `references/classics.md` | 引文 + 5 本经典出处 |
+| 人生 K 线 / 4 维度轨迹图 | `assets/life-kline.md` | ⚠ v3.3 实验性 |
 | 涉及心理脆弱/自伤/反复问 | **`ETHICS.md`** | 关怀回复，**不排盘** |
 
 ⚠️ **渐进加载（Progressive Disclosure）**：默认只 load 本 SKILL.md（约 300 行）；用户问具体问题再按需 load 对应 reference（每个 50-300 行）。**总 token 消耗比 v3.1 降低 ~70%**。
