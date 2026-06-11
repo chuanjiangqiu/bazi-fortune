@@ -1,7 +1,7 @@
 ---
 name: bazi-fortune
-version: 3.2.0
-description: 八字命盘综合评定 — 排盘 + 十神 + 神煞 + 用神 + 调候 + 大运流年 + 六维评定
+version: 3.3.1
+description: 八字命盘综合评定 — 排盘 + 十神 + 神煞 + 用神 + 调候 + 大运流年 + 六维评定 + 人生K线
 triggers:
   - 算命
   - 命盘
@@ -13,19 +13,21 @@ triggers:
   - 算一下命
   - 出生.*分析
   - 命盘综合评定
+  - 人生K线
+  - kline
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [bazi, fortune, 命理, 八字, 紫微, 玄学, 算命, 排盘, 五行, 十神, 大运, 流年]
+    tags: [bazi, fortune, 命理, 八字, 紫微, 玄学, 算命, 排盘, 五行, 十神, 大运, 流年, kline]
     category: creative
     requires_tools: [execute_code]
 ---
 
-# bazi-fortune v3.2
+# bazi-fortune v3.3.1
 
 > v3.2 重大升级：① SKILL.md 拆分为 L1 主文件 + L2 references（节省 ~70% token）② 新增 ETHICS.md（心理防护 + 巴纳姆效应）③ 决策路由表（按问题加载对应 reference）④ v3.0 回测用例入 references/self-test.md ⑤ 4 段式 SKILL.md 标准结构（When/Procedure/Pitfalls/Verification）⑥ frontmatter 补 `metadata.hermes.*`
-> 
-> **v3.3-experimental**：新增 `assets/life-kline.md`（4 维度 sparkline 轨迹图，评分函数待代码化）。⚠ 实验性功能，需在 `references/pitfalls.md` 中标注"辅助工具"边界。
+>
+> **v3.3.1**：`scripts/bazi_calc.py` 主入口已集成 `--kline` / `--kline-output` / `--kline-max-age`，无需中间 JSON 文件即可直接计算并输出人生 K 线报告。内部通过 `build_kline_payload()` 构造标准命盘 dict 后调用 `life_kline.run_from_bazi_dict()`。
 
 > v3.0/v3.1 重要规则（仍生效）：天干五行阴阳速查 / 藏干评分（本气×0.5/中气×0.3/余气×0.2）/ 空亡削弱 / 夜子时归属 / 女命伤官见官大忌 / 大白话优先 / 时间线面向未来 / 输出一致性交叉验证
 > 
@@ -88,6 +90,18 @@ metadata:
 
 > 详细排盘规则见 `references/calendar.md`
 
+### 步骤 2.5：人生 K 线（可选）
+
+如果需要生成人生 K 线报告，直接用 `bazi_calc.py` 的 `--kline` 入口，无需单独调用 `life_kline.py`：
+
+```bash
+python3 scripts/bazi_calc.py -y 2008 -m 1 -d 21 -H 13 -M 0 -g M --kline --kline-output 报告.md --kline-max-age 100
+```
+
+- `--kline`：启用 K 线计算
+- `--kline-output`：输出文件路径；不指定则 stdout
+- `--kline-max-age`：年龄上限，默认 100
+
 ### 步骤 3：身强身弱判定
 
 按 `references/strength-scoring.md` 的量化评分法逐项打分：
@@ -147,10 +161,10 @@ metadata:
 
 **默认模式：直接输出**
 - 完整报告直接输出到终端，**不询问偏好**
-- 用户明确要求保存时，再存到 `/home/neroy/命盘报告/`
+- 用户明确要求保存时，再存到 `C:\Users\neroy\命盘报告\`
 
 **保存模式**：
-1. `mkdir -p /home/neroy/命盘报告/`
+1. `mkdir -p /c/Users/neroy/命盘报告/`
 2. 完整报告写入文件
 3. 输出时只展示关键部分（综合评定 + 终评定语）
 4. 告知用户文件路径
