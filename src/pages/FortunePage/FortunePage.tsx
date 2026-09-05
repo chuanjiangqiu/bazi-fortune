@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
@@ -34,6 +34,7 @@ import {
 } from '@/lib/bazi';
 import { getAquariusFortune, type AquariusFortuneResult } from '@/lib/constellation';
 import { drawDailyTarot, type TarotDrawResult } from '@/lib/tarot';
+import { TarotCard } from '@/components/TarotCard';
 import {
   getWealthOverview,
   getSecondHandPhoneAdvice,
@@ -136,6 +137,12 @@ export default function FortunePage() {
   const [activeTab, setActiveTab] = useState<'day' | 'month' | 'year'>('day');
   const [data, setData] = useState<FullPageData | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [tarotFlipped, setTarotFlipped] = useState(false);
+
+  // 切换日期时重置塔罗牌翻牌状态
+  useEffect(() => {
+    setTarotFlipped(false);
+  }, [fortuneDate]);
 
   // 页面加载后自动测算
   useEffect(() => {
@@ -384,9 +391,12 @@ export default function FortunePage() {
     <div className="min-h-screen bg-gradient-to-br from-[rgb(20_15_25)] via-[rgb(25_20_30)] to-[rgb(15_10_20)] text-[hsl(40_25%_88%)]">
       {/* 背景装饰 */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[hsl(43_85%_58%_/_0.08)] blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-[hsl(5_75%_45%_/_0.06)] blur-3xl" />
-        <div className="absolute top-1/3 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[hsl(260_50%_40%_/_0.04)] blur-3xl" />
+        {/* 星空粒子 */}
+        <div className="starfield absolute inset-0 opacity-40" />
+        {/* 光晕 */}
+        <div className="animate-glow-pulse absolute -top-40 -right-40 h-96 w-96 rounded-full bg-[hsl(43_85%_58%_/_0.08)] blur-3xl" />
+        <div className="animate-glow-pulse absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-[hsl(5_75%_45%_/_0.06)] blur-3xl" style={{ animationDelay: '2s' }} />
+        <div className="animate-glow-pulse absolute top-1/3 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[hsl(260_50%_40%_/_0.04)] blur-3xl" style={{ animationDelay: '4s' }} />
       </div>
 
       <main className="relative mx-auto w-full max-w-5xl px-4 py-8 md:py-12">
@@ -614,28 +624,44 @@ export default function FortunePage() {
                       今日塔罗牌
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="text-center">
-                      <div className={`text-2xl font-bold ${data.tarot.isUpright ? 'text-[hsl(43_85%_65%)]' : 'text-[hsl(300_40%_70%)]'}`}>
-                        {data.tarot.card.name}
-                      </div>
-                      <div className="mt-0.5 text-xs text-muted-foreground">
-                        {data.tarot.card.englishName} · {data.tarot.position}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">吉凶指数</span>
-                      <span className={`text-lg font-bold ${data.tarot.fortuneColor}`}>
-                        {data.tarot.fortuneLevel}
-                      </span>
-                    </div>
-                    <Progress
-                      value={data.tarot.fortuneScore}
-                      className="h-1.5 bg-[hsl(300_30%_22%)]"
+                  <CardContent className="space-y-4">
+                    <TarotCard
+                      card={data.tarot.card}
+                      isUpright={data.tarot.isUpright}
+                      flipped={tarotFlipped}
+                      onFlip={() => setTarotFlipped(!tarotFlipped)}
                     />
-                    <p className="line-clamp-3 text-xs leading-relaxed text-foreground/80">
-                      {data.tarot.todayLesson}
-                    </p>
+                    {tarotFlipped ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">吉凶指数</span>
+                          <span className={`text-lg font-bold ${data.tarot.fortuneColor}`}>
+                            {data.tarot.fortuneLevel} · {data.tarot.fortuneScore}
+                          </span>
+                        </div>
+                        <Progress value={data.tarot.fortuneScore} className="h-1.5 bg-[hsl(300_30%_22%)]" />
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-[hsl(300_40%_75%)]">牌意</p>
+                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.meaning}</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <p className="text-xs font-medium text-[hsl(300_40%_75%)]">财运启示</p>
+                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.wealthInsight}</p>
+                        </div>
+                        <p className="rounded-lg border border-[hsl(300_30%_25%)] bg-[hsl(300_30%_15%_/_0.4)] p-2.5 text-xs leading-relaxed text-[hsl(43_60%_75%)]">
+                          {data.tarot.todayLesson}
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <p className="text-center text-xs text-muted-foreground">
+                        点击卡牌，揭开今日运势
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               </div>

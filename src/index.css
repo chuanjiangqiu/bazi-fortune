@@ -3,3 +3,43 @@
 @import "tw-animate-css";
 @import "./tailwind-theme.css";
 @import "./typography.css";
+
+/* ===== 自定义动画 ===== */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.15); }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 6s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+/* 星空背景粒子 */
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, hsl(43 85% 70% / 0.6), transparent),
+    radial-gradient(1px 1px at 40px 70px, hsl(43 85% 70% / 0.4), transparent),
+    radial-gradient(1px 1px at 90px 40px, hsl(200 80% 75% / 0.5), transparent),
+    radial-gradient(1px 1px at 130px 80px, hsl(43 85% 70% / 0.3), transparent),
+    radial-gradient(1px 1px at 160px 120px, hsl(300 60% 75% / 0.4), transparent),
+    radial-gradient(2px 2px at 200px 50px, hsl(43 85% 70% / 0.5), transparent),
+    radial-gradient(1px 1px at 250px 100px, hsl(200 80% 75% / 0.3), transparent),
+    radial-gradient(1px 1px at 300px 150px, hsl(43 85% 70% / 0.4), transparent);
+  background-repeat: repeat;
+  background-size: 320px 180px;
+}
