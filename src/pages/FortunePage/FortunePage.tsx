@@ -616,51 +616,66 @@ export default function FortunePage() {
                   </CardContent>
                 </Card>
 
-                {/* 塔罗每日一牌卡片 */}
+                {/* 塔罗三牌阵卡片 */}
                 <Card className="border-[hsl(300_30%_30%)] bg-gradient-to-br from-[hsl(220_15%_10%_/_0.8)] to-[hsl(300_25%_12%_/_0.6)] backdrop-blur">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center gap-2 text-base text-[hsl(300_50%_75%)]">
                       <MoonIcon className="size-4" />
-                      今日塔罗牌
+                      今日塔罗三牌阵
+                      <span className="ml-auto text-[10px] font-normal text-muted-foreground">过去20% · 现在50% · 未来30%</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <TarotCard
-                      card={data.tarot.card}
-                      isUpright={data.tarot.isUpright}
-                      flipped={tarotFlipped}
-                      onFlip={() => setTarotFlipped(!tarotFlipped)}
-                    />
+                    <div className="flex items-end justify-center gap-2 md:gap-4">
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground">过去</span>
+                        <TarotCard card={data.tarot.past.card} isUpright={data.tarot.past.isUpright} flipped={tarotFlipped} onFlip={() => setTarotFlipped(!tarotFlipped)} compact />
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] font-medium text-[hsl(43_85%_65%)]">现在</span>
+                        <TarotCard card={data.tarot.present.card} isUpright={data.tarot.present.isUpright} flipped={tarotFlipped} onFlip={() => setTarotFlipped(!tarotFlipped)} highlight />
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground">未来</span>
+                        <TarotCard card={data.tarot.future.card} isUpright={data.tarot.future.isUpright} flipped={tarotFlipped} onFlip={() => setTarotFlipped(!tarotFlipped)} compact />
+                      </div>
+                    </div>
                     {tarotFlipped ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="space-y-3"
-                      >
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">吉凶指数</span>
-                          <span className={`text-lg font-bold ${data.tarot.fortuneColor}`}>
-                            {data.tarot.fortuneLevel} · {data.tarot.fortuneScore}
-                          </span>
+                          <span className="text-xs text-muted-foreground">综合吉凶</span>
+                          <span className={`text-lg font-bold ${data.tarot.fortuneColor}`}>{data.tarot.fortuneLevel} · {data.tarot.fortuneScore}</span>
                         </div>
                         <Progress value={data.tarot.fortuneScore} className="h-1.5 bg-[hsl(300_30%_22%)]" />
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="rounded-lg border border-[hsl(300_30%_25%)] bg-[hsl(300_30%_15%_/_0.3)] p-2">
+                            <p className="text-[10px] text-muted-foreground">过去</p>
+                            <p className="text-xs font-medium text-foreground/90">{data.tarot.past.card.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{data.tarot.past.position} · {data.tarot.past.fortuneScore}分</p>
+                          </div>
+                          <div className="rounded-lg border border-[hsl(43_60%_40%)] bg-[hsl(43_50%_15%_/_0.3)] p-2">
+                            <p className="text-[10px] text-[hsl(43_85%_65%)]">现在</p>
+                            <p className="text-xs font-medium text-foreground/90">{data.tarot.present.card.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{data.tarot.present.position} · {data.tarot.present.fortuneScore}分</p>
+                          </div>
+                          <div className="rounded-lg border border-[hsl(300_30%_25%)] bg-[hsl(300_30%_15%_/_0.3)] p-2">
+                            <p className="text-[10px] text-muted-foreground">未来</p>
+                            <p className="text-xs font-medium text-foreground/90">{data.tarot.future.card.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{data.tarot.future.position} · {data.tarot.future.fortuneScore}分</p>
+                          </div>
+                        </div>
                         <div className="space-y-1.5">
-                          <p className="text-xs font-medium text-[hsl(300_40%_75%)]">牌意</p>
-                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.meaning}</p>
+                          <p className="text-xs font-medium text-[hsl(300_40%_75%)]">现在牌意</p>
+                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.present.meaning}</p>
                         </div>
                         <div className="space-y-1.5">
                           <p className="text-xs font-medium text-[hsl(300_40%_75%)]">财运启示</p>
-                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.wealthInsight}</p>
+                          <p className="text-xs leading-relaxed text-foreground/80">{data.tarot.present.wealthInsight}</p>
                         </div>
-                        <p className="rounded-lg border border-[hsl(300_30%_25%)] bg-[hsl(300_30%_15%_/_0.4)] p-2.5 text-xs leading-relaxed text-[hsl(43_60%_75%)]">
-                          {data.tarot.todayLesson}
-                        </p>
+                        <p className="rounded-lg border border-[hsl(300_30%_25%)] bg-[hsl(300_30%_15%_/_0.4)] p-2.5 text-xs leading-relaxed text-[hsl(43_60%_75%)]">{data.tarot.todayLesson}</p>
                       </motion.div>
                     ) : (
-                      <p className="text-center text-xs text-muted-foreground">
-                        点击卡牌，揭开今日运势
-                      </p>
+                      <p className="text-center text-xs text-muted-foreground">点击任意卡牌，揭开今日三牌阵</p>
                     )}
                   </CardContent>
                 </Card>

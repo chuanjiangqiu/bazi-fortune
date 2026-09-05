@@ -1,4 +1,4 @@
-// EXPORTS: getWealthOverview, getSecondHandPhoneAdvice, getFinanceAdvice, type WealthOverview, type TradeAdvice
+﻿// EXPORTS: getWealthOverview, getSecondHandPhoneAdvice, getFinanceAdvice, type WealthOverview, type TradeAdvice
 // 财运综合评分 + 交易建议生成
 
 import {
@@ -175,14 +175,14 @@ export function getWealthOverview(params: {
   const tarot = drawDailyTarot(date);
   const tarotFortuneScore = tarot.fortuneScore;
 
-  // 综合评分 = 八字 × 60% + 星座 × 25% + 塔罗 × 15%
-  // 八字为核心体系权重最高；星座辅助参考；塔罗占比不宜过高（东西方体系差异大）
+  // 综合评分 = 八字 × 55% + 星座 × 23% + 塔罗 × 22%
+  // 八字为核心体系；星座辅助参考；塔罗三牌阵占比提升至22%
   const totalScore = Math.round(
-    baziWealthScore * 0.6 + constellationWealthScore * 0.25 + tarotFortuneScore * 0.15
+    baziWealthScore * 0.55 + constellationWealthScore * 0.23 + tarotFortuneScore * 0.22
   );
 
   const levelInfo = getLevel(totalScore);
-  const summary = getWealthSummary(totalScore, dayGanShiShen, tarot.card.name, tarot.isUpright);
+  const summary = getWealthSummary(totalScore, dayGanShiShen, tarot.present.card.name, tarot.present.isUpright);
 
   const direction = getWealthDirection(zhi);
   const bestTime = getBestTimePeriod(date, gan);
