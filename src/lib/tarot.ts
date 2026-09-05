@@ -1,4 +1,4 @@
-// EXPORTS: drawDailyTarot, type TarotCard, type TarotDrawResult
+﻿// EXPORTS: drawDailyTarot, type TarotCard, type TarotDrawResult
 // 塔罗牌每日一抽算法 —— 基于日期的确定性计算，无随机因素
 // 22张大阿卡纳牌
 
@@ -301,22 +301,36 @@ export function drawDailyTarot(date: Date): TarotDrawResult {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
+  const dateKey = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const storageKey = `tarot_draw_${dateKey}`;
 
-  // 抽牌索引：(年+月+日) % 22
-  const cardIndex = (y + m + d) % 22;
+  // 抽牌：当天首次打开随机抽1张，存 localStorage，当天内固定；隔天自动重新抽
+  let cardIndex: number;
+  let isUpright: boolean;
+  try {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      cardIndex = parsed.cardIndex;
+      isUpright = parsed.isUpright;
+    } else {
+      cardIndex = Math.floor(Math.random() * 22);
+      isUpright = Math.random() < 0.5;
+      localStorage.setItem(storageKey, JSON.stringify({ cardIndex, isUpright }));
+    }
+  } catch {
+    // localStorage 不可用时回退到确定性算法
+    cardIndex = (y + m + d) % 22;
+    isUpright = d % 2 === 1;
+  }
+
   const card = TAROT_CARDS[cardIndex];
 
-  // 正逆位：日期奇偶决定（奇数正位，偶数逆位）
-  const isUpright = d % 2 === 1;
-
-  // 吉凶分数：正位 = 牌权重；
-  // 逆位 = 向中间值(50)回归，吉牌逆位吉力减弱，凶牌逆位凶性也减弱
+  // 吉凶分数：正位 = 牌权重；逆位 = 向中间值(50)回归
   let fortuneScore: number;
   if (isUpright) {
     fortuneScore = card.fortuneWeight;
   } else {
-    // 向 50 靠拢，回归系数 0.6
-    // 吉牌(>50)逆位：分数下降但不暴跌；凶牌(<50)逆位：分数上升（凶性减弱）
     fortuneScore = Math.round(50 + (card.fortuneWeight - 50) * 0.6);
   }
 
