@@ -295,7 +295,7 @@ export default function FortunePage() {
     // 交易建议（结论 = 十神定方向 → 综合财运分修正 → 地支修正 → 塔罗现在位加持）
     const shiShen = fortune.dayFortune.ganShiShen;
     const zhiRelations = fortune.dayFortune.zhiRelations;
-    const tarotPresent = { name: tarot.present.card.name, isUpright: tarot.present.isUpright, wealthInsight: tarot.present.wealthInsight };
+    const tarotPresent = { name: tarot.present.card.name, isUpright: tarot.present.isUpright };
     const secondHandAdvice = getSecondHandPhoneAdvice({ shiShen, zhiRelations, score: wealth.totalScore, tarotPresent });
     const financeAdvice = getFinanceAdvice({ shiShen, zhiRelations, score: wealth.totalScore, tarotPresent });
 
