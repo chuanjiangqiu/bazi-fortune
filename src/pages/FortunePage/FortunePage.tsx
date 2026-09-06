@@ -133,7 +133,7 @@ const DAY_GAN_STR = '己土（阴土）';
 const CONSTELLATION = '水瓶座';
 
 export default function FortunePage() {
-  const today = new Date(2026, 8, 5); // 2026-09-05
+  const today = new Date(); // 默认取当天，打开页面即显示今日运势
   const [fortuneDate, setFortuneDate] = useState<Date>(today);
   const [activeTab, setActiveTab] = useState<'day' | 'month' | 'year'>('day');
   const [data, setData] = useState<FullPageData | null>(null);
