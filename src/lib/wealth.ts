@@ -1,5 +1,7 @@
-﻿// EXPORTS: getWealthOverview, getSecondHandPhoneAdvice, getFinanceAdvice, type WealthOverview, type TradeAdvice
+// EXPORTS: getWealthOverview, getSecondHandPhoneAdvice, getFinanceAdvice, type WealthOverview, type TradeAdvice, type TarotPresentInput
 // 财运综合评分 + 交易建议生成
+// 交易建议结论 = 日辰十神定基础方向 → 综合财运分收缩修正 → 地支六冲/六合修正 → 塔罗“现在”位加持
+// 每个结论都会生成 reason 推演链，供 UI 展示“结论依据”
 
 import {
   getTenGod,
@@ -27,6 +29,7 @@ export interface TradeAdvice {
   title: string;
   action: string; // 适合：买入/卖出/观望 等
   actionType: 'good' | 'neutral' | 'bad';
+  reason: string[]; // 结论依据（推演链，按判定顺序）
   tips: string[];
   notes: string[];
   // 子项（金融交易有两个子项）
@@ -35,6 +38,64 @@ export interface TradeAdvice {
     action: string;
     actionType: 'good' | 'neutral' | 'bad';
   }[];
+}
+
+// 塔罗“现在”位牌（交易建议只取最小字段，与 tarot.SingleCardResult 结构兼容）
+export interface TarotPresentInput {
+  name: string;
+  isUpright: boolean;
+  wealthInsight: string;
+}
+
+// 十神含义（用于结论依据）
+const SHISHEN_EXPLAIN: Record<string, string> = {
+  '正财': '主正当收益与货物流通，出货/变现方向占优',
+  '偏财': '主意外之财与差价空间，买卖皆有获利机会',
+  '食神': '主眼光与产出，适合挖掘价值与补货',
+  '伤官': '主灵感与折腾，有捡漏机会但易冲动',
+  '比肩': '主同行竞争，容易被压价',
+  '劫财': '主破财与抢价，不宜拼价出货',
+  '正官': '主规则与约束，交易易生纠纷',
+  '七杀': '主压力与冲突，风险偏高',
+  '正印': '主学习沉淀，宜整备不宜大进大出',
+  '偏印': '主思考复盘，宜整理不宜冲动交易',
+};
+
+// 积极动作收缩词（低综合财运分时使用）
+const TIGHTEN_WORD: Record<string, string> = {
+  '卖出': '小批量试出',
+  '买入': '小批量试买',
+  '买卖皆宜': '小批量试水',
+  '加仓': '轻仓加仓',
+  '开仓': '轻仓试仓',
+  '持有': '持有观望',
+  '研究调仓': '只研究不动仓',
+};
+
+// 综合财运分档位解释
+function scoreExplain(score: number): string {
+  if (score >= 70) return `综合财运 ${score} 分偏强，支撑积极操作`;
+  if (score >= 55) return `综合财运 ${score} 分平稳，按基础方向执行`;
+  if (score >= 40) return `综合财运 ${score} 分偏弱，积极动作需收缩`;
+  return `综合财运 ${score} 分低迷，以守为主、不宜主动交易`;
+}
+
+// 动作收缩：综合财运分低于 55 时，积极动作降一档；低于 40 时一律保守
+function tighten(
+  action: string,
+  type: 'good' | 'neutral' | 'bad',
+  score: number,
+): { action: string; type: 'good' | 'neutral' | 'bad' } {
+  if (score >= 55) return { action, type };
+  if (score >= 40) {
+    if (type === 'good') {
+      return { action: TIGHTEN_WORD[action] || `谨慎${action}`, type: 'neutral' };
+    }
+    return { action, type };
+  }
+  if (type === 'good') return { action: '观望', type: 'neutral' };
+  if (type === 'neutral') return { action: '保守观望', type: 'bad' };
+  return { action, type };
 }
 
 // 十神财运基准分
@@ -208,15 +269,20 @@ export function getSecondHandPhoneAdvice(params: {
   shiShen: string;
   zhiRelations: ZhiRelation[];
   score: number;
+  tarotPresent?: TarotPresentInput;
 }): TradeAdvice {
   const { shiShen, zhiRelations, score } = params;
+  const tarotPresent = params.tarotPresent;
   const hasLiuHe = zhiRelations.some(r => r.type === 'liuhe' || r.type === 'sanhe' || r.type === 'bansanhe');
   const hasLiuChong = zhiRelations.some(r => r.type === 'liuchong');
 
   let action = '观望';
   let actionType: 'good' | 'neutral' | 'bad' = 'neutral';
+  const reason: string[] = [];
   const tips: string[] = [];
   const notes: string[] = [];
+
+  reason.push(`日辰十神「${shiShen}」：${SHISHEN_EXPLAIN[shiShen] || '今日平稳'}，定基础方向`);
 
   // 十神判定
   if (shiShen === '偏财') {
@@ -264,20 +330,43 @@ export function getSecondHandPhoneAdvice(params: {
     tips.push('优化listing文案和图片，为后续销售打基础');
   }
 
-  // 地支修正
-  if (hasLiuHe) {
-    notes.push('今日地支六合，交易谈判顺畅，沟通效率高');
-  }
+  // 综合财运分修正（收缩或维持）
+  const baseAction = action;
+  const adjusted = tighten(action, actionType, score);
+  action = adjusted.action;
+  actionType = adjusted.type;
+  reason.push(`${scoreExplain(score)}${adjusted.action !== baseAction ? '，动作已收缩' : ''}`);
+
+  // 地支六冲：真正降级动作（不只是改色块）
   if (hasLiuChong) {
     notes.unshift('⚠️ 今日地支六冲，交易易出变故，务必谨慎');
-    if (actionType === 'good') actionType = 'neutral';
+    reason.push('地支六冲：交易易生变故，动作降级、务必谨慎');
+    if (actionType === 'good') {
+      action = TIGHTEN_WORD[action] || `谨慎${action}`;
+      actionType = 'neutral';
+    }
+  }
+
+  // 地支六合：辅助顺畅，不改变方向
+  if (hasLiuHe) {
+    notes.push('今日地支六合，交易谈判顺畅，沟通效率高');
+    reason.push('地支六合：谈判顺畅，利于成交与议价');
+  }
+
+  // 塔罗“现在”位接入
+  if (tarotPresent) {
+    const upright = tarotPresent.isUpright;
+    const pos = upright ? '正位' : '逆位';
+    tips.push(`塔罗「${tarotPresent.name}」${pos}：${tarotPresent.wealthInsight}`);
+    reason.push(`塔罗「${tarotPresent.name}」${pos}：${upright ? '能量加持，方向可信' : '提示风险，操作留余地'}`);
   }
 
   return {
     title: '二手手机交易',
     action,
     actionType,
-    tips: tips.slice(0, 3),
+    reason,
+    tips: tips.slice(0, 4),
     notes,
   };
 }
@@ -287,8 +376,10 @@ export function getFinanceAdvice(params: {
   shiShen: string;
   zhiRelations: ZhiRelation[];
   score: number;
+  tarotPresent?: TarotPresentInput;
 }): TradeAdvice {
   const { shiShen, zhiRelations, score } = params;
+  const tarotPresent = params.tarotPresent;
   const hasLiuChong = zhiRelations.some(r => r.type === 'liuchong');
   const hasLiuHe = zhiRelations.some(r => r.type === 'liuhe' || r.type === 'sanhe' || r.type === 'bansanhe');
 
@@ -296,8 +387,11 @@ export function getFinanceAdvice(params: {
   let coinType: 'good' | 'neutral' | 'bad' = 'neutral';
   let stockAction = '持有';
   let stockType: 'good' | 'neutral' | 'bad' = 'neutral';
+  const reason: string[] = [];
   const tips: string[] = [];
   const notes: string[] = [];
+
+  reason.push(`日辰十神「${shiShen}」：${SHISHEN_EXPLAIN[shiShen] || '今日平稳'}，定基础方向`);
 
   // 十神判定
   if (shiShen === '偏财') {
@@ -353,9 +447,22 @@ export function getFinanceAdvice(params: {
     tips.push('复盘总结之前的操作，提升认知水平');
   }
 
-  // 六冲修正
+  // 综合财运分修正（币圈、美股各自收缩）
+  const baseCoin = coinAction;
+  const baseStock = stockAction;
+  const coinAdj = tighten(coinAction, coinType, score);
+  coinAction = coinAdj.action;
+  coinType = coinAdj.type;
+  const stockAdj = tighten(stockAction, stockType, score);
+  stockAction = stockAdj.action;
+  stockType = stockAdj.type;
+  const shrunk = coinAdj.action !== baseCoin || stockAdj.action !== baseStock;
+  reason.push(`${scoreExplain(score)}${shrunk ? '，积极动作已收缩' : ''}`);
+
+  // 六冲修正：币圈风险优先，美股长线不受短期冲击
   if (hasLiuChong) {
     notes.unshift('⚠️ 今日地支六冲，行情波动剧烈，合约风险极高');
+    reason.push('地支六冲：行情波动剧烈，合约风险极高，动作降级');
     if (coinType === 'good') {
       coinAction = '轻仓';
       coinType = 'neutral';
@@ -367,6 +474,15 @@ export function getFinanceAdvice(params: {
 
   if (hasLiuHe) {
     notes.push('地支六合，整体趋势相对顺畅');
+    reason.push('地支六合：整体趋势相对顺畅，执行节奏可略从容');
+  }
+
+  // 塔罗“现在”位接入
+  if (tarotPresent) {
+    const upright = tarotPresent.isUpright;
+    const pos = upright ? '正位' : '逆位';
+    tips.push(`塔罗「${tarotPresent.name}」${pos}：${tarotPresent.wealthInsight}`);
+    reason.push(`塔罗「${tarotPresent.name}」${pos}：${upright ? '能量加持，方向可信' : '提示风险，操作留余地'}`);
   }
 
   return {
@@ -374,7 +490,8 @@ export function getFinanceAdvice(params: {
     action: '币圈合约' + coinAction + ' / 美股' + stockAction,
     actionType: (coinType === 'bad' ? 'bad'
       : coinType === 'good' || stockType === 'good' ? 'good' : 'neutral'),
-    tips: tips.slice(0, 3),
+    reason,
+    tips: tips.slice(0, 4),
     notes,
     subItems: [
       { label: '币圈合约', action: coinAction, actionType: coinType },

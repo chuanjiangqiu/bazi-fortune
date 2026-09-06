@@ -22,6 +22,7 @@ import {
   Sun,
   Moon as MoonIcon,
   Zap,
+  Lightbulb,
 } from 'lucide-react';
 import {
   getTenGod,
@@ -285,17 +286,18 @@ export default function FortunePage() {
       date: fDate,
     });
 
-    // 交易建议
-    const shiShen = fortune.dayFortune.ganShiShen;
-    const zhiRelations = fortune.dayFortune.zhiRelations;
-    const secondHandAdvice = getSecondHandPhoneAdvice({ shiShen, zhiRelations, score: wealth.totalScore });
-    const financeAdvice = getFinanceAdvice({ shiShen, zhiRelations, score: wealth.totalScore });
-
     // 星座运势
     const aquarius = getAquariusFortune(fDate);
 
-    // 塔罗牌
+    // 塔罗牌（先抽牌，交易建议引用“现在”位）
     const tarot = drawDailyTarot(fDate);
+
+    // 交易建议（结论 = 十神定方向 → 综合财运分修正 → 地支修正 → 塔罗现在位加持）
+    const shiShen = fortune.dayFortune.ganShiShen;
+    const zhiRelations = fortune.dayFortune.zhiRelations;
+    const tarotPresent = { name: tarot.present.card.name, isUpright: tarot.present.isUpright, wealthInsight: tarot.present.wealthInsight };
+    const secondHandAdvice = getSecondHandPhoneAdvice({ shiShen, zhiRelations, score: wealth.totalScore, tarotPresent });
+    const financeAdvice = getFinanceAdvice({ shiShen, zhiRelations, score: wealth.totalScore, tarotPresent });
 
     return { fortune, wealth, secondHandAdvice, financeAdvice, aquarius, tarot };
   }
@@ -342,7 +344,10 @@ export default function FortunePage() {
               {icon}
               {advice.title}
             </CardTitle>
-            <ActionBadge action={advice.subItems ? advice.subItems[0].action : advice.action} type={advice.actionType} />
+            <ActionBadge
+              action={advice.subItems ? advice.subItems[0].action : advice.action}
+              type={advice.subItems ? advice.subItems[0].actionType : advice.actionType}
+            />
           </div>
           {advice.subItems && (
             <div className="mt-1 flex gap-2">
@@ -362,6 +367,22 @@ export default function FortunePage() {
           )}
         </CardHeader>
         <CardContent className="space-y-3">
+          {advice.reason && advice.reason.length > 0 && (
+            <div className="space-y-1.5 rounded-md border border-[hsl(43_85%_58%_/_0.15)] bg-[hsl(43_85%_58%_/_0.05)] p-3">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[hsl(43_85%_65%)]">
+                <Lightbulb className="size-3.5" />
+                结论依据
+              </div>
+              <ul className="space-y-1">
+                {advice.reason.map((r, i) => (
+                  <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/70">
+                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[hsl(43_85%_58%_/_0.4)]" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="space-y-2">
             <div className="text-xs font-semibold text-[hsl(43_85%_65%)]">具体建议</div>
             <ul className="space-y-1.5">
