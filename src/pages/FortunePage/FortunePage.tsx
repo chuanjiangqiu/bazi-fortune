@@ -320,94 +320,6 @@ export default function FortunePage() {
 
   const wuxingList = ['金', '木', '水', '火', '土'];
 
-  function ActionBadge({ action, type }: { action: string; type: 'good' | 'neutral' | 'bad' }) {
-    const styles = {
-      good: 'border-[hsl(130_54%_42%)] bg-[hsl(130_54%_42%_/_0.15)] text-[hsl(130_54%_55%)]',
-      neutral: 'border-[hsl(43_30%_22%)] bg-[hsl(43_30%_22%_/_0.3)] text-[hsl(43_85%_65%)]',
-      bad: 'border-[hsl(0_84%_60%)] bg-[hsl(0_84%_60%_/_0.1)] text-[hsl(0_84%_70%)]',
-    };
-    const Icon = type === 'good' ? CheckCircle2 : type === 'bad' ? AlertTriangle : MinusCircle;
-    return (
-      <Badge variant="outline" className={`gap-1 px-2 py-1 text-xs font-semibold ${styles[type]}`}>
-        <Icon className="size-3.5" />
-        {action}
-      </Badge>
-    );
-  }
-
-  function TradeCard({ advice, icon }: { advice: TradeAdvice; icon: React.ReactNode }) {
-    return (
-      <Card className="border-[hsl(43_30%_22%)] bg-[hsl(220_15%_10%_/_0.8)] backdrop-blur transition-all hover:border-[hsl(43_85%_58%)_/_0.5]">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg text-[hsl(43_85%_65%)]">
-              {icon}
-              {advice.title}
-            </CardTitle>
-            <ActionBadge
-              action={advice.subItems ? advice.subItems[0].action : advice.action}
-              type={advice.subItems ? advice.subItems[0].actionType : advice.actionType}
-            />
-          </div>
-          {advice.subItems && (
-            <div className="mt-1 flex gap-2">
-              {advice.subItems.map((item, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-xs">
-                  <span className="text-muted-foreground">{item.label}：</span>
-                  <span className={`font-medium ${
-                    item.actionType === 'good' ? 'text-[hsl(130_54%_55%)]'
-                      : item.actionType === 'bad' ? 'text-[hsl(0_84%_70%)]'
-                      : 'text-[hsl(43_85%_65%)]'
-                  }`}>
-                    {item.action}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {advice.reason && advice.reason.length > 0 && (
-            <div className="space-y-1.5 rounded-md border border-[hsl(43_85%_58%_/_0.15)] bg-[hsl(43_85%_58%_/_0.05)] p-3">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-[hsl(43_85%_65%)]">
-                <Lightbulb className="size-3.5" />
-                结论依据
-              </div>
-              <ul className="space-y-1">
-                {advice.reason.map((r, i) => (
-                  <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/70">
-                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[hsl(43_85%_58%_/_0.4)]" />
-                    {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div className="space-y-2">
-            <div className="text-xs font-semibold text-[hsl(43_85%_65%)]">具体建议</div>
-            <ul className="space-y-1.5">
-              {advice.tips.map((tip, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[hsl(43_85%_65%)]" />
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
-          {advice.notes.length > 0 && (
-            <div className="space-y-1.5 rounded-md border border-[hsl(26_90%_49%_/_0.3)] bg-[hsl(26_90%_49%_/_0.05)] p-3">
-              {advice.notes.map((note, i) => (
-                <p key={i} className="text-xs text-[hsl(26_90%_60%)]">
-                  {note}
-                </p>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[rgb(20_15_25)] via-[rgb(25_20_30)] to-[rgb(15_10_20)] text-[hsl(40_25%_88%)]">
       {/* 背景装饰 */}
@@ -963,6 +875,97 @@ export default function FortunePage() {
 }
 
 // 运势详情子组件
+
+
+function ActionBadge({ action, type }: { action: string; type: 'good' | 'neutral' | 'bad' }) {
+  const styles = {
+    good: 'border-[hsl(130_54%_42%)] bg-[hsl(130_54%_42%_/_0.15)] text-[hsl(130_54%_55%)]',
+    neutral: 'border-[hsl(43_30%_22%)] bg-[hsl(43_30%_22%_/_0.3)] text-[hsl(43_85%_65%)]',
+    bad: 'border-[hsl(0_84%_60%)] bg-[hsl(0_84%_60%_/_0.1)] text-[hsl(0_84%_70%)]',
+  };
+  const Icon = type === 'good' ? CheckCircle2 : type === 'bad' ? AlertTriangle : MinusCircle;
+  return (
+    <Badge variant="outline" className={`gap-1 px-2 py-1 text-xs font-semibold ${styles[type]}`}>
+      <Icon className="size-3.5" />
+      {action}
+    </Badge>
+  );
+}
+
+function TradeCard({ advice, icon }: { advice: TradeAdvice; icon: React.ReactNode }) {
+  return (
+    <Card className="border-[hsl(43_30%_22%)] bg-[hsl(220_15%_10%_/_0.8)] backdrop-blur transition-all hover:border-[hsl(43_85%_58%)_/_0.5]">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg text-[hsl(43_85%_65%)]">
+            {icon}
+            {advice.title}
+          </CardTitle>
+          <ActionBadge
+            action={advice.subItems ? advice.subItems[0].action : advice.action}
+            type={advice.subItems ? advice.subItems[0].actionType : advice.actionType}
+          />
+        </div>
+        {advice.subItems && (
+          <div className="mt-1 flex gap-2">
+            {advice.subItems.map((item, i) => (
+              <div key={i} className="flex items-center gap-1.5 text-xs">
+                <span className="text-muted-foreground">{item.label}：</span>
+                <span className={`font-medium ${
+                  item.actionType === 'good' ? 'text-[hsl(130_54%_55%)]'
+                    : item.actionType === 'bad' ? 'text-[hsl(0_84%_70%)]'
+                    : 'text-[hsl(43_85%_65%)]'
+                }`}>
+                  {item.action}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {advice.reason && advice.reason.length > 0 && (
+          <div className="space-y-1.5 rounded-md border border-[hsl(43_85%_58%_/_0.15)] bg-[hsl(43_85%_58%_/_0.05)] p-3">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-[hsl(43_85%_65%)]">
+              <Lightbulb className="size-3.5" />
+              结论依据
+            </div>
+            <ul className="space-y-1">
+              {advice.reason.map((r, i) => (
+                <li key={i} className="flex items-start gap-1.5 text-xs text-foreground/70">
+                  <span className="mt-1.5 size-1 shrink-0 rounded-full bg-[hsl(43_85%_58%_/_0.4)]" />
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <div className="space-y-2">
+          <div className="text-xs font-semibold text-[hsl(43_85%_65%)]">具体建议</div>
+          <ul className="space-y-1.5">
+            {advice.tips.map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-foreground/90">
+                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[hsl(43_85%_65%)]" />
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {advice.notes.length > 0 && (
+          <div className="space-y-1.5 rounded-md border border-[hsl(26_90%_49%_/_0.3)] bg-[hsl(26_90%_49%_/_0.05)] p-3">
+            {advice.notes.map((note, i) => (
+              <p key={i} className="text-xs text-[hsl(26_90%_60%)]">
+                {note}
+              </p>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+
 function FortuneDetail({ unit, label }: { unit: FortuneUnit; label: string }) {
   const titleMap = { day: '今日运势', month: '本月运势', year: '本年运势' } as const;
   const ganZhiLabelMap = { day: '今日干支', month: '本月干支', year: '本年干支' } as const;

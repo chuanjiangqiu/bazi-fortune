@@ -292,7 +292,7 @@ export function getDimensionScores(
   const hasXing = zhiRelations.some(r => r.type === 'sanxing' || r.type === 'zixing');
   const hasHai = zhiRelations.some(r => r.type === 'liuhai');
   const isTaohuaDay = TAOHUA_ZHI.includes(dayZhi);
-  const riZhiChong = hasChong && zhiRelations.some(r => r.targetZhi.includes(riZhi));
+  const riZhiChong = hasChong && zhiRelations.some(r => r.type === 'liuchong' && r.targetZhi === riZhi);
 
   // 事业维度
   let careerScore = 60;
