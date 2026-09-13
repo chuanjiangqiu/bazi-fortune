@@ -60,10 +60,10 @@ function seedFromDate(date: Date): number {
 function isAquariusSeason(date: Date): number {
   const m = date.getMonth() + 1;
   const d = date.getDate();
+  // 本命生日附近额外加成（优先判断，避免被水瓶月条件拦截）
+  if (m === 1 && d >= 18 && d <= 22) return 15;
   if (m === 1 && d >= 20) return 10;
   if (m === 2 && d <= 18) return 10;
-  // 本命生日附近额外加成
-  if (m === 1 && d >= 18 && d <= 22) return 15;
   return 0;
 }
 
