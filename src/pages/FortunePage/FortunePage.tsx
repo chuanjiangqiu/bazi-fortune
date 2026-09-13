@@ -273,16 +273,15 @@ export default function FortunePage() {
   function calculateAll(fDate: Date): FullPageData {
     const fortune = calculateFortune(fDate);
     const dayGanZhi = fortune.dayFortune.ganZhi;
-    const mingJuZhiList = [
-      fortune.pillars.year.zhi, fortune.pillars.month.zhi,
-      fortune.pillars.day.zhi, fortune.pillars.time.zhi,
-    ];
 
     // 财运总览
     const wealth = getWealthOverview({
       dayGanZhi,
       dayGan: fortune.dayGan,
-      mingJuZhiList,
+      mingJuZhiList: [
+        fortune.pillars.year.zhi, fortune.pillars.month.zhi,
+        fortune.pillars.day.zhi, fortune.pillars.time.zhi,
+      ],
       date: fDate,
     });
 

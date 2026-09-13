@@ -87,7 +87,7 @@ function getWealthDirection(dayZhi: string): string {
   return map[dayZhi] || '正南方';
 }
 
-function getBestTimePeriod(date: Date, dayGan: string): string {
+function getBestTimePeriod(dayGan: string): string {
   const dayMap: Record<string, [number, number]> = {
     '甲': [5, 7], '乙': [7, 9], '丙': [9, 11], '丁': [11, 13],
     '戊': [13, 15], '己': [15, 17], '庚': [17, 19], '辛': [19, 21],
@@ -158,7 +158,7 @@ export function getWealthOverview(params: {
   const levelInfo = getLevel(totalScore);
   const summary = getWealthSummary(totalScore, dayGanShiShen, tarot.present.card.name, tarot.present.isUpright);
   const direction = getWealthDirection(zhi);
-  const bestTime = getBestTimePeriod(date, gan);
+  const bestTime = getBestTimePeriod(gan);
   const hasLiuChong = zhiRelations.some(r => r.type === 'liuchong');
   const forbidden = getForbiddenThing(dayGanShiShen, hasLiuChong);
 
