@@ -92,7 +92,7 @@ function getLoveScore(base: number, date: Date): { score: number; description: s
   const seasonBonus = isAquariusSeason(date);
   const weekdayBonus = weekdayFactor(date);
   const raw = calcDimension(base, 17, 23);
-  const score = Math.min(100, Math.max(0, raw + seasonBonus * 0.5 + weekdayBonus * 0.3));
+  const score = Math.round(Math.min(100, Math.max(0, raw + seasonBonus * 0.5 + weekdayBonus * 0.3)));
 
   let description: string;
   if (score >= 80) {
@@ -113,7 +113,7 @@ function getCareerScore(base: number, date: Date): { score: number; description:
   const seasonBonus = isAquariusSeason(date);
   const weekdayBonus = weekdayFactor(date);
   const raw = calcDimension(base, 29, 37);
-  const score = Math.min(100, Math.max(0, raw + seasonBonus * 0.6 + weekdayBonus * 0.5));
+  const score = Math.round(Math.min(100, Math.max(0, raw + seasonBonus * 0.6 + weekdayBonus * 0.5)));
 
   let description: string;
   if (score >= 80) {
@@ -134,7 +134,7 @@ function getWealthScore(base: number, date: Date): { score: number; description:
   const seasonBonus = isAquariusSeason(date);
   const weekdayBonus = weekdayFactor(date);
   const raw = calcDimension(base, 41, 43);
-  const score = Math.min(100, Math.max(0, raw + seasonBonus * 0.7 + weekdayBonus * 0.4));
+  const score = Math.round(Math.min(100, Math.max(0, raw + seasonBonus * 0.7 + weekdayBonus * 0.4)));
 
   let description: string;
   if (score >= 80) {
@@ -155,7 +155,7 @@ function getHealthScore(base: number, date: Date): { score: number; description:
   const seasonBonus = isAquariusSeason(date);
   const weekdayBonus = weekdayFactor(date);
   const raw = calcDimension(base, 53, 59);
-  const score = Math.min(100, Math.max(0, raw + seasonBonus * 0.3 + weekdayBonus * 0.2));
+  const score = Math.round(Math.min(100, Math.max(0, raw + seasonBonus * 0.3 + weekdayBonus * 0.2)));
 
   let description: string;
   if (score >= 80) {
@@ -210,11 +210,7 @@ export function getAquariusFortune(date: Date): AquariusFortuneResult {
   const career = getCareerScore(base, date);
   const wealth = getWealthScore(base, date);
   const health = getHealthScore(base, date);
-  // 分数取整
-  love.score = Math.round(love.score);
-  career.score = Math.round(career.score);
-  wealth.score = Math.round(wealth.score);
-  health.score = Math.round(health.score);
+  // 分数已在各维度函数内取整，此处不再重复
 
   // 综合分：四维加权平均 + 水瓶季节加成
   const seasonBonus = isAquariusSeason(date);

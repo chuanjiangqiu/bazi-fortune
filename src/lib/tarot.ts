@@ -201,9 +201,13 @@ export function drawDailyTarot(date: Date): TarotDrawResult {
     }
   } catch {
     // localStorage 不可用时回退到确定性算法
-    const idx1 = (y + m + d) % 78;
-    const idx2 = (y * 2 + m + d) % 78;
-    const idx3 = (y * 3 + m + d) % 78;
+    // 日期派生三个不同系数，避免 78 的倍数年份导致重复索引
+    let idx1 = (y + m + d) % 78;
+    let idx2 = (y * 2 + m * 3 + d * 5) % 78;
+    let idx3 = (y * 3 + m * 7 + d * 11) % 78;
+    // 碰撞防御：若出现重复，逐个向后偏移确保三张不重复
+    if (idx2 === idx1) idx2 = (idx2 + 1) % 78;
+    if (idx3 === idx1 || idx3 === idx2) idx3 = (idx3 + 1) % 78;
     draws = [
       { cardIndex: idx1, isUpright: d % 2 === 1 },
       { cardIndex: idx2, isUpright: d % 2 === 0 },
