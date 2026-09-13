@@ -117,17 +117,17 @@ export function getTenGod(dayGan: string, targetGan: string): string {
 
   // 我克
   if (WUXING_KE[myWuxing] === targetWuxing) {
-    return sameYinYang ? '偏财' : '正财';
+    return sameYinYang ? '正财' : '偏财';
   }
 
   // 克我
   if (WUXING_KE[targetWuxing] === myWuxing) {
-    return sameYinYang ? '七杀' : '正官';
+    return sameYinYang ? '正官' : '七杀';
   }
 
   // 生我
   if (WUXING_SHENG[targetWuxing] === myWuxing) {
-    return sameYinYang ? '偏印' : '正印';
+    return sameYinYang ? '正印' : '偏印';
   }
 
   return '';
