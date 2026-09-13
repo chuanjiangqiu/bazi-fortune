@@ -1,11 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router-dom";
-import { ErrorBoundary, type FallbackProps } from "react-error-boundary";
+import { ErrorBoundary } from "react-error-boundary";
 import App from "./app";
 import "./index.css";
 
-function ErrorFallback({ error }: FallbackProps & { error: Error }) {
+function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-4">
@@ -28,7 +28,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HashRouter>
       <ErrorBoundary
-        FallbackComponent={ErrorFallback as React.ComponentType<FallbackProps>}
+        FallbackComponent={ErrorFallback}
       >
         <App />
       </ErrorBoundary>

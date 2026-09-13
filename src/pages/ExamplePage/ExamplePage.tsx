@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+// ExamplePage — 预留页面，当前未启用
 // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // import { Button } from '@/components/ui/button';
 // import { RefreshCw, TrendingUp, PieChart, Clock } from 'lucide-react';

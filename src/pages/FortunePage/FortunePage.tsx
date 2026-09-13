@@ -32,6 +32,7 @@ import {
   calcFortuneByGanZhi,
   type ZhiRelation,
   type DimensionScore,
+  ZHI_WUXING,
 } from '@/lib/bazi';
 import { getAquariusFortune, type AquariusFortuneResult } from '@/lib/constellation';
 import { drawDailyTarot, type TarotDrawResult } from '@/lib/tarot';
@@ -114,12 +115,6 @@ interface FullPageData {
 }
 
 const PILLAR_LABELS = ['年柱', '月柱', '日柱', '时柱'] as const;
-
-const ZHI_WUXING: Record<string, string> = {
-  子: '水', 丑: '土', 寅: '木', 卯: '木',
-  辰: '土', 巳: '火', 午: '火', 未: '土',
-  申: '金', 酉: '金', 戌: '土', 亥: '水',
-};
 
 // 固定命主信息
 const BIRTH_YEAR = 2008;
